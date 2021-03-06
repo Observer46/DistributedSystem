@@ -28,10 +28,14 @@ public class UDPChatChannel implements  IChatChannel {
 
     public DatagramChannel getDatagramChannel() { return this.datagramChannel; }
 
+    public SocketAddress getAddress() throws IOException {
+        return this.datagramChannel.getRemoteAddress();
+    }
+
     @Override
     public String receiveMsg() throws IOException{
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
-        this.datagramChannel.read(this.msgBuffer);
+        SocketAddress from =  this.datagramChannel.receive(this.msgBuffer);     // Need that!
         String response = new String(this.msgBuffer.array()).trim();
         return response;
     }

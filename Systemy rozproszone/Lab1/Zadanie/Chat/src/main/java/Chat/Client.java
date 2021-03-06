@@ -3,6 +3,7 @@ package Chat;
 
 import java.io.*;
 import java.net.*;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
@@ -43,6 +44,10 @@ public class Client {
         return this.tcpChannel.getSocketChannel();
     }
 
+    public SocketAddress getUdpSocketChannelAddress() throws IOException {
+        return this.udpChannel.getAddress();
+    }
+
     public String getName() {
         return this.name;
     }
@@ -76,6 +81,14 @@ public class Client {
 
     public String tcpAddressString() throws IOException {
         return this.tcpChannel.addressString();
+    }
+
+    public String udpAddressString() throws IOException {
+        return this.udpChannel.addressString();
+    }
+
+    public SocketAddress getUdpAddress() throws IOException {
+        return this.udpChannel.getDatagramChannel().getRemoteAddress(); // or local
     }
 
     public static void main(String[] args) throws IOException {

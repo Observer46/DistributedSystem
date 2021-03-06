@@ -3,10 +3,7 @@ package Chat;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.*;
 
 public class Server {
@@ -19,12 +16,16 @@ public class Server {
 
 
     private final HashMap<String, Client> clientsMap = new HashMap<>();
-    private final HashMap<SocketChannel, Client> socketsToClients = new HashMap<>();
+    private final HashMap<SocketChannel, Client> tcpSocketsToClients = new HashMap<>();
+    private final HashMap<SocketAddress, Client> udpSocketsToClients = new HashMap<>();
     private final ServerSocketChannel serverSocket;
-    private boolean shutdown = false;
+
     private final Selector tcpSelector;
     private final UDPChatChannel udpChannel;
     private final ByteBuffer msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);  // For UDP
+
+    private boolean shutdown = false;
+
 
     public Server(int port) throws IOException {
         this.tcpSelector = Selector.open();
@@ -36,12 +37,13 @@ public class Server {
     }
 
     public void addClientSocketOnly(Client client){ // Used during logging process
-        this.socketsToClients.put(client.getTcpSocketChannel(), client);
+        this.tcpSocketsToClients.put(client.getTcpSocketChannel(), client);
     }
 
     private void addClient(Client client) throws IOException {  // When logging in process complete
         System.out.println("Added client: " + client.getName());
         this.clientsMap.put(client.getName(), client);
+        this.udpSocketsToClients.put(client.getUdpSocketChannelAddress(), client);
     }
 
     public boolean validateClient(String clientName){
@@ -104,17 +106,21 @@ public class Server {
         }
     }
 
-    public void udpProcessClients(){
-
+    public void udpProcessClients() throws IOException {
+        SocketAddress sender = this.udpChannel.receiveMsg();
     }
 
     private void tcpLogClientMsg(String clientName, String msg){
-        System.out.println("Log: " + clientName + ": " + msg);
+        System.out.println("(TCP) Log: " + clientName + ": " + msg);
+    }
+
+    public void udpLogClientMsg(String clientName, String msg){
+        System.out.println("(UDP) Log: " + clientName + ": " + msg);
     }
 
     public void tcpProcessMsg(SelectionKey key) throws IOException {
         SocketChannel clientSocketChannel = (SocketChannel) key.channel();
-        Client thisClient = this.socketsToClients.get(clientSocketChannel);
+        Client thisClient = this.tcpSocketsToClients.get(clientSocketChannel);
 
         String senderName = thisClient.getName();
         String msg = thisClient.tcpReceiveMsg();
@@ -122,7 +128,7 @@ public class Server {
         if(this.validateClient(senderName)){
             this.tcpSendMsgToClients(senderName, msg);
         }
-        else {
+        else {  // Validation procedure
             String clientName = msg;
             if(this.clientsMap.containsKey(clientName) ) {
                 thisClient.tcpSendMsg(Server.WRONG_NAME);
@@ -140,14 +146,26 @@ public class Server {
         }
     }
 
+    public void udpProcessMsg(){
+        SocketAddress client
+    }
+
     public void tcpSendMsgToClients(String senderName, String msg) throws IOException {
         if(!endOfConnectionCheck(senderName, msg)) {    // Don't send when message is ending connection
             for (Client receiver : this.clientsMap.values()) {
                 if (!receiver.getName().equals(senderName))
-                    receiver.tcpSendMsg(msg);
+                    receiver.tcpSendMsg(senderName + ": " + msg);
             }
         }
         this.tcpLogClientMsg(senderName, msg);
+    }
+
+    public void udpSendMsgToClients(String senderName, String msg) throws IOException {
+        for (Client receiver : this.clientsMap.values()) {
+            if (!receiver.getName().equals(senderName))
+                receiver.udpSendMsg(senderName + ": " + msg, receiver.getUdpAddress());
+        }
+        this.udpLogClientMsg(senderName, msg);
     }
 
     private void serverCycle() throws InterruptedException, IOException {
