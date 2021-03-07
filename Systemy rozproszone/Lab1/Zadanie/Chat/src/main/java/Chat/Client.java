@@ -3,8 +3,6 @@ package Chat;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.DatagramChannel;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 public class Client {
@@ -18,6 +16,7 @@ public class Client {
     private UDPChatChannel multicastChannel;    // maybe not needed
     private BufferedReader stdIn;
     private SocketAddress udpServerSocketAddress;
+    private SocketAddress myUdpAddress;
 
     public Client(String name, TCPChatChannel tcpChannel) throws IOException {
         this.name = name;
@@ -55,11 +54,11 @@ public class Client {
     }
 
     public SocketAddress getUdpAddressServerSide() {
-        return this.udpChannel.getMyAddress();
+        return this.myUdpAddress;
     }
 
     public void setUdpAddressForServerSide(SocketAddress address){
-        this.udpChannel.setMyAddress(address);
+        this.myUdpAddress = address;
     }
 
     public String getName() {

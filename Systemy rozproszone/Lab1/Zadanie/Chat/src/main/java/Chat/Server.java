@@ -42,7 +42,6 @@ public class Server {
     private void addClient(Client client) throws IOException {  // When logging in process complete
         System.out.println("Added client: " + client.getName());
         this.clientsMap.put(client.getName(), client);
-        //this.udpSocketsToClients.put(client.getUdpAddress(), client);
     }
 
     public boolean validateClient(String clientName){

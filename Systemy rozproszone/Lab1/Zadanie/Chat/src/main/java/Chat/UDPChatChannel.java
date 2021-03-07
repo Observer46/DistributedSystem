@@ -19,7 +19,6 @@ public class UDPChatChannel implements  IChatChannel {
 
     private DatagramChannel datagramChannel;
     private ByteBuffer msgBuffer;
-    private SocketAddress myAddress;
 
     public UDPChatChannel() throws IOException {
         this.datagramChannel = DatagramChannel.open();
@@ -36,8 +35,6 @@ public class UDPChatChannel implements  IChatChannel {
         this.datagramChannel.configureBlocking(false);
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
     }
-
-    public void setMyAddress(SocketAddress address) { this.myAddress = address; }
 
     public DatagramChannel getDatagramChannel() { return this.datagramChannel; }
 
@@ -67,9 +64,5 @@ public class UDPChatChannel implements  IChatChannel {
     @Override
     public void cleanUp()  throws IOException{
         this.datagramChannel.close();
-    }
-
-    public SocketAddress getMyAddress() {
-        return this.myAddress;
     }
 }
