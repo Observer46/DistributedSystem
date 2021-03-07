@@ -37,7 +37,6 @@ public class TCPChatChannel implements IChatChannel {
         return this.socketChannel;
     }
 
-    @Override
     public String receiveMsg() throws IOException {
         this.msgBuffer = ByteBuffer.allocate(512);
         this.socketChannel.read(this.msgBuffer);

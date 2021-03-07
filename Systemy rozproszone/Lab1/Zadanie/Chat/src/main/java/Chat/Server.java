@@ -2,7 +2,6 @@ package Chat;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
@@ -22,7 +21,7 @@ public class Server {
 
     private final Selector tcpSelector;
     private final UDPChatChannel udpChannel;
-    private final ByteBuffer msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);  // For UDP
+    //private final ByteBuffer msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);  // For UDP
 
     private boolean shutdown = false;
 
@@ -43,7 +42,7 @@ public class Server {
     private void addClient(Client client) throws IOException {  // When logging in process complete
         System.out.println("Added client: " + client.getName());
         this.clientsMap.put(client.getName(), client);
-        this.udpSocketsToClients.put(client.getUdpSocketChannelAddress(), client);
+        //this.udpSocketsToClients.put(client.getUdpAddress(), client);
     }
 
     public boolean validateClient(String clientName){
@@ -107,7 +106,11 @@ public class Server {
     }
 
     public void udpProcessClients() throws IOException {
-        SocketAddress sender = this.udpChannel.receiveMsg();
+        Pair<SocketAddress, String> datagramInfo = this.udpChannel.receiveMsg();
+        while(datagramInfo.getFirst() != null){
+            this.udpProcessMsg(datagramInfo);
+            datagramInfo = this.udpChannel.receiveMsg();
+        }
     }
 
     private void tcpLogClientMsg(String clientName, String msg){
@@ -146,8 +149,24 @@ public class Server {
         }
     }
 
-    public void udpProcessMsg(){
-        SocketAddress client
+    public void udpProcessMsg(Pair<SocketAddress, String> datagramInfo) throws IOException {
+        String msg = datagramInfo.getSecond();
+        if(msg.startsWith(UDPChatChannel.UDP_NAME_PREFIX)){
+            String name = msg.substring(UDPChatChannel.UDP_NAME_PREFIX.length());
+            this.addUdpChannelToClient(datagramInfo.getFirst(), name);
+            return;
+        }
+
+        Client client = this.udpSocketsToClients.get(datagramInfo.getFirst());
+        String clientName = client.getName();
+        if(this.validateClient(clientName))
+            this.udpSendMsgToClients(clientName, msg);
+    }
+
+    private void addUdpChannelToClient(SocketAddress address, String name) {
+        Client client = this.clientsMap.get(name);
+        client.setUdpAddressForServerSide(address);
+        this.udpSocketsToClients.put(client.getUdpAddressServerSide(), client);
     }
 
     public void tcpSendMsgToClients(String senderName, String msg) throws IOException {
@@ -163,14 +182,15 @@ public class Server {
     public void udpSendMsgToClients(String senderName, String msg) throws IOException {
         for (Client receiver : this.clientsMap.values()) {
             if (!receiver.getName().equals(senderName))
-                receiver.udpSendMsg(senderName + ": " + msg, receiver.getUdpAddress());
+                receiver.udpSendMsg(senderName + "(-U): " + msg, receiver.getUdpAddress());
         }
         this.udpLogClientMsg(senderName, msg);
     }
 
     private void serverCycle() throws InterruptedException, IOException {
         while (true) {
-            tcpProcessClients();
+            this.tcpProcessClients();
+            this.udpProcessClients();
             if(shutdown){
                 this.serverShutdown();
                 break;

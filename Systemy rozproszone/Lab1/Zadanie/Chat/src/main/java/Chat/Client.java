@@ -17,6 +17,7 @@ public class Client {
     private UDPChatChannel udpChannel;
     private UDPChatChannel multicastChannel;    // maybe not needed
     private BufferedReader stdIn;
+    private SocketAddress udpServerSocketAddress;
 
     public Client(String name, TCPChatChannel tcpChannel) throws IOException {
         this.name = name;
@@ -24,6 +25,7 @@ public class Client {
     }
 
     public Client(InetAddress serverAddress, int serverPort) throws IOException {
+        this.udpChannel = new UDPChatChannel();
         this.tcpChannel = new TCPChatChannel(serverAddress, serverPort);
         this.stdIn = new BufferedReader(new InputStreamReader(System.in));
         this.name = Client.NO_NAME;
@@ -36,16 +38,28 @@ public class Client {
 
             if(response.equals(Server.ACCEPT_NAME))
                 this.name = name;
-            this.tcpChannel.setNonBlocking();
         }
+
+        this.tcpChannel.setNonBlocking();   // ??? was in 'while'
+        this.udpServerSocketAddress = new InetSocketAddress("localhost", Server.SERVER_PORT);
+        String udpValidation = UDPChatChannel.UDP_NAME_PREFIX + this.name;
+        this.udpSendMsg(udpValidation, this.udpServerSocketAddress);    // needs confirmation
     }
 
     public SocketChannel getTcpSocketChannel(){
         return this.tcpChannel.getSocketChannel();
     }
 
-    public SocketAddress getUdpSocketChannelAddress() throws IOException {
+    public SocketAddress getUdpAddress() throws IOException {
         return this.udpChannel.getAddress();
+    }
+
+    public SocketAddress getUdpAddressServerSide() {
+        return this.udpChannel.getMyAddress();
+    }
+
+    public void setUdpAddressForServerSide(SocketAddress address){
+        this.udpChannel.setMyAddress(address);
     }
 
     public String getName() {
@@ -70,7 +84,7 @@ public class Client {
         this.udpChannel.sendMsg(msg, target);
     }
 
-    public String udpReceiveMsg() throws IOException {
+    public Pair<SocketAddress, String> udpReceiveMsg() throws IOException {
         return this.udpChannel.receiveMsg();
     }
 
@@ -87,8 +101,20 @@ public class Client {
         return this.udpChannel.addressString();
     }
 
-    public SocketAddress getUdpAddress() throws IOException {
-        return this.udpChannel.getDatagramChannel().getRemoteAddress(); // or local
+    public void parseAndSendMsg(String msg) throws IOException {
+//        if(msg.length() == 0)
+//            return;
+
+        if(msg.startsWith(UDPChatChannel.UDP_MSG)){
+            String parsedMsg = msg.substring(2);
+            if(parsedMsg.length() > 1)
+                this.udpSendMsg(parsedMsg, this.udpServerSocketAddress);
+            else
+                this.udpSendMsg(UDPChatChannel.UDP_ASCII_ART, this.udpServerSocketAddress);
+        }
+        else{
+            this.tcpSendMsg(msg);
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -101,7 +127,14 @@ public class Client {
             String msg = client.tcpReceiveMsg();
             if(msg != null)
                 System.out.println(msg);
-            client.tcpSendMsg(client.stdIn.readLine());
+
+            Pair<SocketAddress, String> udpMsg = client.udpReceiveMsg();
+            msg = udpMsg.getSecond();
+            if(msg != null)
+                System.out.println(msg);
+
+            msg = client.stdIn.readLine();
+            client.parseAndSendMsg(msg);
         }
     }
 }
