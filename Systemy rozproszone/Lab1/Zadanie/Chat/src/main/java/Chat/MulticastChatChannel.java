@@ -31,16 +31,14 @@ public class MulticastChatChannel  implements IChatChannel{
         this.multicastKey = this.multicastChannel.join(multicastAddress, netInt);
     }
 
-    public DatagramChannel getMulticastChannel() { return this.multicastChannel; }
-
     public Pair<SocketAddress, String> receiveMsg() throws IOException{     // Only passive side
         if(this.multicastKey.isValid()) {
             this.msgBuffer = ByteBuffer.allocate(MulticastChatChannel.BUFFER_SIZE);
             SocketAddress from = this.multicastChannel.receive(this.msgBuffer);
             String response = new String(this.msgBuffer.array()).trim();
-            return new Pair<SocketAddress, String>(from, response);
+            return new Pair<>(from, response);
         }
-        return null;    // oof
+        return null;
     }
 
     @Override

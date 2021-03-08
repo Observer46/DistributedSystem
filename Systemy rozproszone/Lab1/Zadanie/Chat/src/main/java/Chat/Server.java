@@ -14,15 +14,13 @@ public class Server {
     public static final int SERVER_PORT = 6969;
 
 
-    private final HashMap<String, Client> clientsMap = new HashMap<>();
-    private final HashMap<SocketChannel, Client> tcpSocketsToClients = new HashMap<>();
-    private final HashMap<SocketAddress, Client> udpSocketsToClients = new HashMap<>();
+    private final HashMap<String, ClientData> clientsMap = new HashMap<>();
+    private final HashMap<SocketChannel, ClientData> tcpSocketsToClients = new HashMap<>();
+    private final HashMap<SocketAddress, ClientData> udpSocketsToClients = new HashMap<>();
     private final ServerSocketChannel serverSocket;
 
     private final Selector tcpSelector;
     private final UDPChatChannel udpChannel;
-    //private final ByteBuffer msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);  // For UDP
-
     private boolean shutdown = false;
 
 
@@ -35,13 +33,13 @@ public class Server {
         this.udpChannel = new UDPChatChannel(port);
     }
 
-    public void addClientSocketOnly(Client client){ // Used during logging process
-        this.tcpSocketsToClients.put(client.getTcpSocketChannel(), client);
+    public void addClientSocketOnly(ClientData clientData){ // Used during granting validation
+        this.tcpSocketsToClients.put(clientData.getTcpSocketChannel(), clientData);
     }
 
-    private void addClient(Client client) throws IOException {  // When logging in process complete
-        System.out.println("Added client: " + client.getName());
-        this.clientsMap.put(client.getName(), client);
+    private void addClient(ClientData clientData) throws IOException {  // When granted validation
+        System.out.println("Added client: " + clientData.getName());
+        this.clientsMap.put(clientData.getName(), clientData);
     }
 
     public boolean validateClient(String clientName){
@@ -55,10 +53,10 @@ public class Server {
     }
 
     private void serverShutdown() throws IOException {
-        Collection<Client> clients = new ArrayList<>(this.clientsMap.values());
-        for (Client client : clients) {
-            client.tcpSendMsg("Server: shutdown - connection lost.");
-            removeClient(client.getName());
+        Collection<ClientData> clients = new ArrayList<>(this.clientsMap.values());
+        for (ClientData clientData : clients) {
+            clientData.tcpSendMsg("Server: shutdown - connection lost.");
+            removeClient(clientData.getName());
         }
         this.tcpSelector.close();
     }
@@ -68,19 +66,17 @@ public class Server {
             this.removeClient(clientName);
             return true;
         }
-
         if(msg.equals(SERVER_KILL_COMMAND)) {
             this.shutdown = true;
             return true;
         }
-
         return false;
     }
 
     private void acceptNewClient() throws IOException {
         TCPChatChannel clientChannel = new TCPChatChannel(this.tcpSelector, this.serverSocket);
-        Client client = new Client(Client.NO_NAME, clientChannel);
-        this.addClientSocketOnly(client);
+        ClientData clientData = new ClientData(Client.NO_NAME, clientChannel);
+        this.addClientSocketOnly(clientData);
         System.out.println("New connection: " + clientChannel.addressString());
         clientChannel.sendMsg("Enter your name:");
     }
@@ -91,15 +87,12 @@ public class Server {
         Iterator<SelectionKey> iterator = selectedKeys.iterator();
         while (iterator.hasNext()) {
             SelectionKey key = iterator.next();
-
             if (key.isAcceptable()) {
                 this.acceptNewClient();
             }
-
             if (key.isReadable()) {
                 this.tcpProcessMsg(key);
             }
-
             iterator.remove();
         }
     }
@@ -122,7 +115,7 @@ public class Server {
 
     public void tcpProcessMsg(SelectionKey key) throws IOException {
         SocketChannel clientSocketChannel = (SocketChannel) key.channel();
-        Client thisClient = this.tcpSocketsToClients.get(clientSocketChannel);
+        ClientData thisClient = this.tcpSocketsToClients.get(clientSocketChannel);
 
         String senderName = thisClient.getName();
         String msg = thisClient.tcpReceiveMsg();
@@ -156,21 +149,22 @@ public class Server {
             return;
         }
 
-        Client client = this.udpSocketsToClients.get(datagramInfo.getFirst());
-        String clientName = client.getName();
+        ClientData clientData = this.udpSocketsToClients.get(datagramInfo.getFirst());
+        String clientName = clientData.getName();
+
         if(this.validateClient(clientName))
             this.udpSendMsgToClients(clientName, msg);
     }
 
     private void addUdpChannelToClient(SocketAddress address, String name) {
-        Client client = this.clientsMap.get(name);
-        client.setUdpAddressForServerSide(address);
-        this.udpSocketsToClients.put(client.getUdpAddressServerSide(), client);
+        ClientData clientData = this.clientsMap.get(name);
+        clientData.setUdpAddressForServerSide(address);
+        this.udpSocketsToClients.put(clientData.getUdpAddressServerSide(), clientData);
     }
 
     public void tcpSendMsgToClients(String senderName, String msg) throws IOException {
         if(!endOfConnectionCheck(senderName, msg)) {    // Don't send when message is ending connection
-            for (Client receiver : this.clientsMap.values()) {
+            for (ClientData receiver : this.clientsMap.values()) {
                 if (!receiver.getName().equals(senderName))
                     receiver.tcpSendMsg(senderName + ": " + msg);
             }
@@ -179,7 +173,7 @@ public class Server {
     }
 
     public void udpSendMsgToClients(String senderName, String msg) throws IOException {
-        for (Client receiver : this.clientsMap.values()) {
+        for (ClientData receiver : this.clientsMap.values()) {
             if (!receiver.getName().equals(senderName))
                 this.udpChannel.sendMsg(senderName + " (-U): " + msg, receiver.getUdpAddressServerSide());
         }
@@ -197,10 +191,6 @@ public class Server {
             Thread.sleep(10);
         }
     }
-
-//    public void logBuffer(){
-//        System.out.println("TCPBUFFER: " + new String(this.msgBuffer.array()).trim());
-//    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Server: Hello world!");

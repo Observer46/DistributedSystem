@@ -10,7 +10,7 @@ import java.nio.channels.Selector;
 public class UDPChatChannel implements  IChatChannel {
 
     public static final String UDP_ASCII_ART =
-            "\n      /\\_/\\\n" +
+            "\n`     /\\_/\\\n" +
             " /\\  / o o \\\n" +
             "//\\\\ \\~(*)~/\n" +
             "`  \\/   ^ /\n" +
@@ -26,7 +26,6 @@ public class UDPChatChannel implements  IChatChannel {
 
     public UDPChatChannel() throws IOException {
         this.datagramChannel = DatagramChannel.open();
-        //this.datagramChannel.bind(new InetSocketAddress(targetAddress, targetPort));
         this.datagramChannel.bind(null);
         this.datagramChannel.configureBlocking(false);
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
@@ -34,22 +33,21 @@ public class UDPChatChannel implements  IChatChannel {
 
     public UDPChatChannel(int port) throws IOException {
         this.datagramChannel = DatagramChannel.open();
-        this.datagramChannel.bind(new InetSocketAddress(port));
+        this.datagramChannel.bind(new InetSocketAddress("localhost", port));
         this.datagramChannel.configureBlocking(false);
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
     }
 
-    public DatagramChannel getDatagramChannel() { return this.datagramChannel; }
-
     public SocketAddress getAddress() throws IOException {
-        return this.datagramChannel.getRemoteAddress();
+        InetSocketAddress address = (InetSocketAddress) this.datagramChannel.getLocalAddress();
+        return address;
     }
 
     public Pair<SocketAddress, String> receiveMsg() throws IOException{
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
-        SocketAddress from =  this.datagramChannel.receive(this.msgBuffer);     // Need that!
+        SocketAddress from =  this.datagramChannel.receive(this.msgBuffer);
         String response = new String(this.msgBuffer.array()).trim();
-        return new Pair<SocketAddress, String>(from, response);
+        return new Pair<>(from, response);
     }
 
 

@@ -13,15 +13,9 @@ public class Client {
     private String name;
     private TCPChatChannel tcpChannel;
     private UDPChatChannel udpChannel;
-    private MulticastChatChannel multicastChannel;    // maybe not needed
+    private MulticastChatChannel multicastChannel;
     private BufferedReader stdIn;
     private SocketAddress udpServerSocketAddress;
-    private SocketAddress myUdpAddress;
-
-    public Client(String name, TCPChatChannel tcpChannel) throws IOException {
-        this.name = name;
-        this.tcpChannel = tcpChannel;
-    }
 
     public Client(InetAddress serverAddress, int serverPort) throws IOException {
         this.udpChannel = new UDPChatChannel();
@@ -39,35 +33,15 @@ public class Client {
                 this.name = name;
         }
 
-        this.tcpChannel.setNonBlocking();   // ??? was in 'while'
+        this.tcpChannel.setNonBlocking();
         this.udpServerSocketAddress = new InetSocketAddress("localhost", Server.SERVER_PORT);
         String udpValidation = UDPChatChannel.UDP_NAME_PREFIX + this.name;
         this.udpSendMsg(udpValidation, this.udpServerSocketAddress);    // needs confirmation
         this.multicastChannel = new MulticastChatChannel();
     }
 
-    public SocketChannel getTcpSocketChannel(){
-        return this.tcpChannel.getSocketChannel();
-    }
-
     public SocketAddress getUdpAddress() throws IOException {
         return this.udpChannel.getAddress();
-    }
-
-    public SocketAddress getUdpAddressServerSide() {
-        return this.myUdpAddress;
-    }
-
-    public void setUdpAddressForServerSide(SocketAddress address){
-        this.myUdpAddress = address;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name){
-        this.name = name;
     }
 
     public void tcpSendMsg(String msg) throws IOException {
@@ -88,8 +62,17 @@ public class Client {
         Pair<SocketAddress, String> datagramInfo =  this.multicastChannel.receiveMsg();
         if(datagramInfo != null){
             SocketAddress from = datagramInfo.getFirst();
-            if(from.equals(this.getUdpAddress()))
+            if(from == null)
+                return "";
+
+            String myAddressString = InetAddress.getLocalHost().getHostAddress();
+            InetSocketAddress mySocketAddress = (InetSocketAddress) this.getUdpAddress();
+            int myPort = mySocketAddress.getPort();
+            SocketAddress myAddress = new InetSocketAddress(myAddressString, myPort);
+
+            if(from.equals(myAddress))       // Do not send to yourself
                 return null;
+
             String msg = datagramInfo.getSecond();
             return msg;
         }
@@ -105,14 +88,6 @@ public class Client {
         this.udpChannel.cleanUp();
     }
 
-    public String tcpAddressString() throws IOException {
-        return this.tcpChannel.addressString();
-    }
-
-    public String udpAddressString() throws IOException {
-        return this.udpChannel.addressString();
-    }
-
     public void parseAndSendMsg(String msg) throws IOException {
 //        if(msg.length() == 0)
 //            return;
@@ -126,13 +101,14 @@ public class Client {
         }
         else if(msg.startsWith(MulticastChatChannel.MULTICAST_MSG)){
             String msgContent = msg.substring(2);
-            String parsedMsg = this.name + " (-M):" + msgContent;
             InetAddress address = InetAddress.getByName(MulticastChatChannel.MULTICAST_ADDRESS);
             InetSocketAddress multicastTarget = new InetSocketAddress(address, MulticastChatChannel.MULTICAST_PORT);
-            if(msgContent.length() > 1)
-                this.udpSendMsg(parsedMsg, multicastTarget);
-            else
-                this.udpSendMsg(UDPChatChannel.UDP_ASCII_ART, multicastTarget);
+
+            if(msgContent.trim().length() == 0)
+                msgContent = UDPChatChannel.UDP_ASCII_ART;
+
+            String parsedMsg = this.name + " (-M):" + msgContent;
+            this.udpSendMsg(parsedMsg, multicastTarget);
         }
         else{
             this.tcpSendMsg(msg);
@@ -158,7 +134,7 @@ public class Client {
             msg = client.multicastReceiveMsg();
             if(msg != null)
                 System.out.println(msg);
-            
+
             msg = client.stdIn.readLine();
             client.parseAndSendMsg(msg);
         }
