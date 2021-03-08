@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.channels.MembershipKey;
-import java.nio.channels.Selector;
 
 public class UDPChatChannel implements  IChatChannel {
 
