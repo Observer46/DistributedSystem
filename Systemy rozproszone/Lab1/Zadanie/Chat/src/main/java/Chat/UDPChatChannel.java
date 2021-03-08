@@ -1,19 +1,23 @@
 package Chat;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.MembershipKey;
 import java.nio.channels.Selector;
 
 public class UDPChatChannel implements  IChatChannel {
 
-    public static final String UDP_ASCII_ART = "123";
+    public static final String UDP_ASCII_ART =
+            "\n      /\\_/\\\n" +
+            " /\\  / o o \\\n" +
+            "//\\\\ \\~(*)~/\n" +
+            "`  \\/   ^ /\n" +
+            "   | \\|| ||\n" +
+            "   \\ '|| ||\n" +
+            "    \\)()-())";
     public static final String UDP_MSG = "-U";
-    public static final String UDP_MULTICAST_MSG = "-M";
     public static final String UDP_NAME_PREFIX = "-name:";
     public static final int BUFFER_SIZE = 1024;
 
@@ -30,7 +34,6 @@ public class UDPChatChannel implements  IChatChannel {
 
     public UDPChatChannel(int port) throws IOException {
         this.datagramChannel = DatagramChannel.open();
-        //this.datagramChannel.bind(new InetSocketAddress(targetAddress, targetPort));
         this.datagramChannel.bind(new InetSocketAddress(port));
         this.datagramChannel.configureBlocking(false);
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);

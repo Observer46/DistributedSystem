@@ -181,7 +181,7 @@ public class Server {
     public void udpSendMsgToClients(String senderName, String msg) throws IOException {
         for (Client receiver : this.clientsMap.values()) {
             if (!receiver.getName().equals(senderName))
-                receiver.udpSendMsg(senderName + "(-U): " + msg, receiver.getUdpAddress());
+                this.udpChannel.sendMsg(senderName + " (-U): " + msg, receiver.getUdpAddressServerSide());
         }
         this.udpLogClientMsg(senderName, msg);
     }

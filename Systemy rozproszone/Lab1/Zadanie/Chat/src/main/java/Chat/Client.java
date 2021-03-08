@@ -13,7 +13,7 @@ public class Client {
     private String name;
     private TCPChatChannel tcpChannel;
     private UDPChatChannel udpChannel;
-    private UDPChatChannel multicastChannel;    // maybe not needed
+    private MulticastChatChannel multicastChannel;    // maybe not needed
     private BufferedReader stdIn;
     private SocketAddress udpServerSocketAddress;
     private SocketAddress myUdpAddress;
@@ -43,6 +43,7 @@ public class Client {
         this.udpServerSocketAddress = new InetSocketAddress("localhost", Server.SERVER_PORT);
         String udpValidation = UDPChatChannel.UDP_NAME_PREFIX + this.name;
         this.udpSendMsg(udpValidation, this.udpServerSocketAddress);    // needs confirmation
+        this.multicastChannel = new MulticastChatChannel();
     }
 
     public SocketChannel getTcpSocketChannel(){
@@ -83,6 +84,18 @@ public class Client {
         this.udpChannel.sendMsg(msg, target);
     }
 
+    public String multicastReceiveMsg() throws IOException {
+        Pair<SocketAddress, String> datagramInfo =  this.multicastChannel.receiveMsg();
+        if(datagramInfo != null){
+            SocketAddress from = datagramInfo.getFirst();
+            if(from.equals(this.getUdpAddress()))
+                return null;
+            String msg = datagramInfo.getSecond();
+            return msg;
+        }
+        return "";
+    }
+
     public Pair<SocketAddress, String> udpReceiveMsg() throws IOException {
         return this.udpChannel.receiveMsg();
     }
@@ -111,6 +124,16 @@ public class Client {
             else
                 this.udpSendMsg(UDPChatChannel.UDP_ASCII_ART, this.udpServerSocketAddress);
         }
+        else if(msg.startsWith(MulticastChatChannel.MULTICAST_MSG)){
+            String msgContent = msg.substring(2);
+            String parsedMsg = this.name + " (-M):" + msgContent;
+            InetAddress address = InetAddress.getByName(MulticastChatChannel.MULTICAST_ADDRESS);
+            InetSocketAddress multicastTarget = new InetSocketAddress(address, MulticastChatChannel.MULTICAST_PORT);
+            if(msgContent.length() > 1)
+                this.udpSendMsg(parsedMsg, multicastTarget);
+            else
+                this.udpSendMsg(UDPChatChannel.UDP_ASCII_ART, multicastTarget);
+        }
         else{
             this.tcpSendMsg(msg);
         }
@@ -132,6 +155,10 @@ public class Client {
             if(msg != null)
                 System.out.println(msg);
 
+            msg = client.multicastReceiveMsg();
+            if(msg != null)
+                System.out.println(msg);
+            
             msg = client.stdIn.readLine();
             client.parseAndSendMsg(msg);
         }
