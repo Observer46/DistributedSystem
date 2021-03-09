@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="amqp-client-5.11.0-javadoc">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/amqp-client-5.11.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/slf4j-api-1.7.29.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/slf4j-simple-1.6.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/amqp-client-5.11.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/slf4j-api-1.7.29-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/java/lib/slf4j-simple-1.6.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/src/main/java" />
+      <root url="file://$PROJECT_DIR$/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

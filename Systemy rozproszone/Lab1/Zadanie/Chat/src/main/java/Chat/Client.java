@@ -8,24 +8,27 @@ import java.nio.channels.SocketChannel;
 public class Client {
 
     public static final String END_MSG = "-exit";
+    public static final String HELP_MSG = "-help";
     public static final String NO_NAME = "unnamed";
 
     private String name;
     private TCPChatChannel tcpChannel;
     private UDPChatChannel udpChannel;
     private MulticastChatChannel multicastChannel;
-    private BufferedReader stdIn;
+    private ChatTerminal chatTerminal;
     private SocketAddress udpServerSocketAddress;
+    private boolean alive = true;
 
     public Client(InetAddress serverAddress, int serverPort) throws IOException {
         this.udpChannel = new UDPChatChannel();
         this.tcpChannel = new TCPChatChannel(serverAddress, serverPort);
-        this.stdIn = new BufferedReader(new InputStreamReader(System.in));
+        this.chatTerminal = new ChatTerminal();
+        this.printToTerminal("Initiating connection to chat server...");
         this.name = Client.NO_NAME;
 
         while(this.name.equals(Client.NO_NAME)){
-            System.out.println(this.tcpChannel.receiveMsg());
-            String name = this.stdIn.readLine();
+            this.printToTerminal(this.tcpChannel.receiveMsg());
+            String name = this.chatTerminal.getInputBlocking();
             this.tcpChannel.sendMsg(name);
             String response = this.tcpReceiveMsg();
 
@@ -40,14 +43,20 @@ public class Client {
         this.multicastChannel = new MulticastChatChannel();
     }
 
+    public boolean isAlive(){
+        return this.alive;
+    }
+
     public SocketAddress getUdpAddress() throws IOException {
         return this.udpChannel.getAddress();
     }
 
     public void tcpSendMsg(String msg) throws IOException {
         this.tcpChannel.sendMsg(msg);
-        if(msg.equals(Client.END_MSG))
+        if(msg.equals(Client.END_MSG)) {
             this.cleanUp();
+            this.alive = false;
+        }
     }
 
     public String tcpReceiveMsg() throws IOException {
@@ -63,7 +72,7 @@ public class Client {
         if(datagramInfo != null){
             SocketAddress from = datagramInfo.getFirst();
             if(from == null)
-                return "";
+                return null;
 
             String myAddressString = InetAddress.getLocalHost().getHostAddress();
             InetSocketAddress mySocketAddress = (InetSocketAddress) this.getUdpAddress();
@@ -76,7 +85,7 @@ public class Client {
             String msg = datagramInfo.getSecond();
             return msg;
         }
-        return "";
+        return null;
     }
 
     public Pair<SocketAddress, String> udpReceiveMsg() throws IOException {
@@ -86,18 +95,33 @@ public class Client {
     public void cleanUp() throws IOException {
         this.tcpChannel.cleanUp();
         this.udpChannel.cleanUp();
+        this.chatTerminal.close();
+    }
+
+    public void listCommands() throws IOException {
+        this.printToTerminal(Client.HELP_MSG + " -> list all commands");
+        this.printToTerminal(Client.END_MSG + " -> shut application down");
+        this.printToTerminal(UDPChatChannel.UDP_MSG + " [message] -> send message using UDP (if no message specified, an ascii art cat is sent");
+        this.printToTerminal(MulticastChatChannel.MULTICAST_MSG + " [message] -> send message using multicast UDP (if no message specified, an ascii art cat is sent");
     }
 
     public void parseAndSendMsg(String msg) throws IOException {
-//        if(msg.length() == 0)
-//            return;
+        if(msg == null)
+            return;
+        if(msg.equals(Client.HELP_MSG)) {
+            this.listCommands();
+            return;
+        }
 
         if(msg.startsWith(UDPChatChannel.UDP_MSG)){
-            String parsedMsg = msg.substring(2);
-            if(parsedMsg.length() > 1)
-                this.udpSendMsg(parsedMsg, this.udpServerSocketAddress);
-            else
-                this.udpSendMsg(UDPChatChannel.UDP_ASCII_ART, this.udpServerSocketAddress);
+            String msgContent = msg.substring(2);
+
+            if(msgContent.trim().length() == 0)
+                msgContent = UDPChatChannel.UDP_ASCII_ART;
+
+            this.udpSendMsg(msgContent, this.udpServerSocketAddress);
+            String msgToShow = this.name + " (-U): " + msgContent;
+            msg = msgToShow;
         }
         else if(msg.startsWith(MulticastChatChannel.MULTICAST_MSG)){
             String msgContent = msg.substring(2);
@@ -109,34 +133,57 @@ public class Client {
 
             String parsedMsg = this.name + " (-M):" + msgContent;
             this.udpSendMsg(parsedMsg, multicastTarget);
+            msg = parsedMsg;
         }
         else{
             this.tcpSendMsg(msg);
+            String msgToShow = this.name + ": " + msg;
+            msg = msgToShow;
         }
+
+        this.printToTerminal(msg);
+    }
+
+    public void printToTerminal(String text) throws IOException {
+        this.chatTerminal.printBufferForClient(text);
+    }
+
+    public String getInputFromTerminal(){
+        return this.chatTerminal.getStringToPrint();
+    }
+
+    public void updateTerminalInput() throws IOException {
+        this.chatTerminal.putChar();
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Hello world!");
         InetAddress serverAddress = InetAddress.getByName("localhost");
         int port = Server.SERVER_PORT;
+        try {
+            Client client = new Client(serverAddress, port);
+            client.printToTerminal("Successfully connected to chat server!");
+            client.printToTerminal("For help with commands type -help");
+            while(client.isAlive()){
+                String msg = client.tcpReceiveMsg();
+                if(msg != null)
+                    client.printToTerminal(msg);
 
-        Client client = new Client(serverAddress, port);
-        while(true){
-            String msg = client.tcpReceiveMsg();
-            if(msg != null)
-                System.out.println(msg);
+                Pair<SocketAddress, String> udpMsg = client.udpReceiveMsg();
+                msg = udpMsg.getSecond();
+                if(msg != null)
+                    client.printToTerminal(msg);
 
-            Pair<SocketAddress, String> udpMsg = client.udpReceiveMsg();
-            msg = udpMsg.getSecond();
-            if(msg != null)
-                System.out.println(msg);
+                msg = client.multicastReceiveMsg();
+                if(msg != null)
+                    client.printToTerminal(msg);
 
-            msg = client.multicastReceiveMsg();
-            if(msg != null)
-                System.out.println(msg);
-
-            msg = client.stdIn.readLine();
-            client.parseAndSendMsg(msg);
+                client.updateTerminalInput();
+                msg = client.getInputFromTerminal();
+                client.parseAndSendMsg(msg);
+            }
+            client.cleanUp();
+        }catch(ConnectException e){
+            System.out.println("Connection failed - cannot contact server");
         }
     }
 }

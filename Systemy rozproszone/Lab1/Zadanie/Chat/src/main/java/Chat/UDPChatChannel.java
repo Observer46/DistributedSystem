@@ -8,7 +8,7 @@ import java.nio.channels.DatagramChannel;
 public class UDPChatChannel implements  IChatChannel {
 
     public static final String UDP_ASCII_ART =
-            "\n`     /\\_/\\\n" +
+            "`\n      /\\_/\\\n" +
             " /\\  / o o \\\n" +
             "//\\\\ \\~(*)~/\n" +
             "`  \\/   ^ /\n" +
@@ -45,6 +45,7 @@ public class UDPChatChannel implements  IChatChannel {
         this.msgBuffer = ByteBuffer.allocate(UDPChatChannel.BUFFER_SIZE);
         SocketAddress from =  this.datagramChannel.receive(this.msgBuffer);
         String response = new String(this.msgBuffer.array()).trim();
+        response = response.length() == 0 ? null : response;
         return new Pair<>(from, response);
     }
 

@@ -41,17 +41,13 @@ public class TCPChatChannel implements IChatChannel {
         this.msgBuffer = ByteBuffer.allocate(512);
         this.socketChannel.read(this.msgBuffer);
         String response = new String(this.msgBuffer.array()).trim();
-        //this.msgBuffer.clear();
-        //this.logBuffer();
-        return response;
+        return response.length() == 0 ? null : response;
     }
 
     public void sendMsg(String msg) throws IOException {
         this.msgBuffer = ByteBuffer.allocate(512);
         this.msgBuffer = ByteBuffer.wrap(msg.getBytes());
         this.socketChannel.write(this.msgBuffer);
-        //this.msgBuffer.clear();
-        //this.logBuffer();
     }
 
     public void logBuffer(){
