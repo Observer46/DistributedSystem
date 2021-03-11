@@ -23,6 +23,7 @@ public class Client {
         this.udpChannel = new UDPChatChannel();
         this.tcpChannel = new TCPChatChannel(serverAddress, serverPort);
         this.chatTerminal = new ChatTerminal();
+        this.printToTerminal("<Chat client>");
         this.printToTerminal("Initiating connection to chat server...");
         this.name = Client.NO_NAME;
 
@@ -163,23 +164,27 @@ public class Client {
             Client client = new Client(serverAddress, port);
             client.printToTerminal("Successfully connected to chat server!");
             client.printToTerminal("For help with commands type -help");
-            while(client.isAlive()){
-                String msg = client.tcpReceiveMsg();
-                if(msg != null)
-                    client.printToTerminal(msg);
+            try {
+                while (client.isAlive()) {
+                    String msg = client.tcpReceiveMsg();
+                    if (msg != null)
+                        client.printToTerminal(msg);
 
-                Pair<SocketAddress, String> udpMsg = client.udpReceiveMsg();
-                msg = udpMsg.getSecond();
-                if(msg != null)
-                    client.printToTerminal(msg);
+                    Pair<SocketAddress, String> udpMsg = client.udpReceiveMsg();
+                    msg = udpMsg.getSecond();
+                    if (msg != null)
+                        client.printToTerminal(msg);
 
-                msg = client.multicastReceiveMsg();
-                if(msg != null)
-                    client.printToTerminal(msg);
+                    msg = client.multicastReceiveMsg();
+                    if (msg != null)
+                        client.printToTerminal(msg);
 
-                client.updateTerminalInput();
-                msg = client.getInputFromTerminal();
-                client.parseAndSendMsg(msg);
+                    client.updateTerminalInput();
+                    msg = client.getInputFromTerminal();
+                    client.parseAndSendMsg(msg);
+                }
+            }catch (SocketException e){
+                System.out.println("Connection to server has been lost - shutting down!");
             }
             client.cleanUp();
         }catch(ConnectException e){

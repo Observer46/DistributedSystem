@@ -10,7 +10,6 @@ public class Server {
     public static final String SERVER_KILL_COMMAND = "-kill";
     public static final String WRONG_NAME = "-wrong_name";
     public static final String ACCEPT_NAME = "-ok_name";
-    public static final int MAX_CLIENTS = 16;   // Not used (yet)
     public static final int SERVER_PORT = 6969;
 
 
@@ -118,26 +117,28 @@ public class Server {
         ClientData thisClient = this.tcpSocketsToClients.get(clientSocketChannel);
 
         String senderName = thisClient.getName();
-        String msg = thisClient.tcpReceiveMsg();
+        try {
+            String msg = thisClient.tcpReceiveMsg();
 
-        if(this.validateClient(senderName)){
-            this.tcpSendMsgToClients(senderName, msg);
-        }
-        else {  // Validation procedure
-            String clientName = msg;
-            if(this.clientsMap.containsKey(clientName) ) {
-                thisClient.tcpSendMsg(Server.WRONG_NAME);
-                thisClient.tcpSendMsg("Nickname: " + clientName + " is already taken - pick new nickname:");
+            if (this.validateClient(senderName)) {
+                this.tcpSendMsgToClients(senderName, msg);
+            } else {  // Validation procedure
+                String clientName = msg;
+                if (this.clientsMap.containsKey(clientName)) {
+                    thisClient.tcpSendMsg(Server.WRONG_NAME);
+                    thisClient.tcpSendMsg("Nickname: " + clientName + " is already taken - pick new nickname:");
+                } else if (clientName.equals(Client.NO_NAME)) {
+                    thisClient.tcpSendMsg(Server.WRONG_NAME);
+                    thisClient.tcpSendMsg("Nickname: " + clientName + " is not valid - pick valid nickname:");
+                } else {
+                    thisClient.tcpSendMsg(Server.ACCEPT_NAME);
+                    thisClient.setName(clientName);
+                    this.addClient(thisClient);
+                }
             }
-            else if(clientName.equals(Client.NO_NAME)) {
-                thisClient.tcpSendMsg(Server.WRONG_NAME);
-                thisClient.tcpSendMsg("Nickname: " + clientName + " is not valid - pick valid nickname:");
-            }
-            else{
-                thisClient.tcpSendMsg(Server.ACCEPT_NAME);
-                thisClient.setName(clientName);
-                this.addClient(thisClient);
-            }
+        }catch (SocketException e){
+            System.out.println("Connection to client: " + senderName +  " has been lost");
+            this.removeClient(senderName);
         }
     }
 
@@ -184,7 +185,7 @@ public class Server {
         while (true) {
             this.tcpProcessClients();
             this.udpProcessClients();
-            if(shutdown){
+            if (shutdown) {
                 this.serverShutdown();
                 break;
             }
