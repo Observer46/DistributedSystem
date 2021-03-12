@@ -1,30 +1,36 @@
 package Chat;
 
+import Chat.ChatChannels.MulticastChatChannel;
+import Chat.ChatChannels.TCPChatChannel;
+import Chat.ChatChannels.UDPChatChannel;
+import Chat.Utils.ChatTerminal;
+import Chat.Utils.Pair;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.SocketChannel;
 
 public class Client {
 
     public static final String END_MSG = "-exit";
     public static final String HELP_MSG = "-help";
     public static final String NO_NAME = "unnamed";
+    public static final String LIST_MSG = "-list";
 
     private String name;
-    private TCPChatChannel tcpChannel;
-    private UDPChatChannel udpChannel;
-    private MulticastChatChannel multicastChannel;
-    private ChatTerminal chatTerminal;
-    private SocketAddress udpServerSocketAddress;
+    private final TCPChatChannel tcpChannel;
+    private final UDPChatChannel udpChannel;
+    private final MulticastChatChannel multicastChannel;
+    private final ChatTerminal chatTerminal;
+    private final SocketAddress udpServerSocketAddress;
     private boolean alive = true;
 
     public Client(InetAddress serverAddress, int serverPort) throws IOException {
+        this.chatTerminal = new ChatTerminal();
+        this.printToTerminal("Initiating connection to chat server...");
         this.udpChannel = new UDPChatChannel();
         this.tcpChannel = new TCPChatChannel(serverAddress, serverPort);
-        this.chatTerminal = new ChatTerminal();
-        this.printToTerminal("<Chat client>");
-        this.printToTerminal("Initiating connection to chat server...");
+        this.printToTerminal("Connected to chat server!");
+
         this.name = Client.NO_NAME;
 
         while(this.name.equals(Client.NO_NAME)){
@@ -83,8 +89,7 @@ public class Client {
             if(from.equals(myAddress))       // Do not send to yourself
                 return null;
 
-            String msg = datagramInfo.getSecond();
-            return msg;
+            return datagramInfo.getSecond();
         }
         return null;
     }
@@ -102,8 +107,9 @@ public class Client {
     public void listCommands() throws IOException {
         this.printToTerminal(Client.HELP_MSG + " -> list all commands");
         this.printToTerminal(Client.END_MSG + " -> shut application down");
-        this.printToTerminal(UDPChatChannel.UDP_MSG + " [message] -> send message using UDP (if no message specified, an ascii art cat is sent");
-        this.printToTerminal(MulticastChatChannel.MULTICAST_MSG + " [message] -> send message using multicast UDP (if no message specified, an ascii art cat is sent");
+        this.printToTerminal(UDPChatChannel.UDP_MSG + " [message] -> send message using UDP\n(if no message specified, an ascii art cat is sent");
+        this.printToTerminal(MulticastChatChannel.MULTICAST_MSG + " [message] -> send message using multicast UDP\n(if no message specified, an ascii art cat is sent");
+        this.printToTerminal(Client.LIST_MSG + " -> list all clients in chat");
     }
 
     public void parseAndSendMsg(String msg) throws IOException {
@@ -121,8 +127,7 @@ public class Client {
                 msgContent = UDPChatChannel.UDP_ASCII_ART;
 
             this.udpSendMsg(msgContent, this.udpServerSocketAddress);
-            String msgToShow = this.name + " (-U): " + msgContent;
-            msg = msgToShow;
+            msg = this.name + " (-U): " + msgContent;
         }
         else if(msg.startsWith(MulticastChatChannel.MULTICAST_MSG)){
             String msgContent = msg.substring(2);
@@ -138,8 +143,7 @@ public class Client {
         }
         else{
             this.tcpSendMsg(msg);
-            String msgToShow = this.name + ": " + msg;
-            msg = msgToShow;
+            msg = this.name + ": " + msg;
         }
 
         this.printToTerminal(msg);

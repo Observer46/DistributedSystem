@@ -1,4 +1,6 @@
-package Chat;
+package Chat.Utils;
+
+import Chat.ChatChannels.TCPChatChannel;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -7,10 +9,10 @@ import java.nio.channels.SocketChannel;
 public class ClientData {   // Server side
 
     private String name;
-    private TCPChatChannel tcpChannel;
+    private final TCPChatChannel tcpChannel;
     private SocketAddress myUdpAddress;
 
-    public ClientData(String name, TCPChatChannel tcpChannel) throws IOException {
+    public ClientData(String name, TCPChatChannel tcpChannel) {
         this.name = name;
         this.tcpChannel = tcpChannel;
     }

@@ -1,4 +1,6 @@
-package Chat;
+package Chat.ChatChannels;
+
+import Chat.Utils.Pair;
 
 import java.io.IOException;
 import java.net.*;
@@ -6,16 +8,16 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.MembershipKey;
 
-public class MulticastChatChannel  implements IChatChannel{
+public class MulticastChatChannel  implements UDPChannel {
 
     public static final String MULTICAST_MSG = "-M";
     public static final int BUFFER_SIZE = 1024;
     public static final String MULTICAST_ADDRESS = "225.255.0.1";
     public static final int MULTICAST_PORT = 1337;
 
-    private DatagramChannel multicastChannel;
+    private final DatagramChannel multicastChannel;
     private ByteBuffer msgBuffer;
-    private MembershipKey multicastKey;
+    private final MembershipKey multicastKey;
 
     public MulticastChatChannel() throws IOException {
         InetAddress multicastAddress = InetAddress.getByName(MulticastChatChannel.MULTICAST_ADDRESS);

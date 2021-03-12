@@ -1,4 +1,4 @@
-package Chat;
+package Chat.ChatChannels;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,9 +9,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class TCPChatChannel implements IChatChannel {
+public class TCPChatChannel implements ChatChannel {
 
-    private SocketChannel socketChannel;
+    private final SocketChannel socketChannel;
     private ByteBuffer msgBuffer;
 
     // Server side
@@ -48,10 +48,6 @@ public class TCPChatChannel implements IChatChannel {
         this.msgBuffer = ByteBuffer.allocate(512);
         this.msgBuffer = ByteBuffer.wrap(msg.getBytes());
         this.socketChannel.write(this.msgBuffer);
-    }
-
-    public void logBuffer(){
-        System.out.println("TCPBUFFER: " + new String(this.msgBuffer.array()).trim());
     }
 
     @Override

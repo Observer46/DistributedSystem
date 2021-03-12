@@ -1,11 +1,13 @@
-package Chat;
+package Chat.ChatChannels;
+
+import Chat.Utils.Pair;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
-public class UDPChatChannel implements  IChatChannel {
+public class UDPChatChannel implements UDPChannel {
 
     public static final String UDP_ASCII_ART =
             "`\n      /\\_/\\\n" +
@@ -19,7 +21,7 @@ public class UDPChatChannel implements  IChatChannel {
     public static final String UDP_NAME_PREFIX = "-name:";
     public static final int BUFFER_SIZE = 1024;
 
-    private DatagramChannel datagramChannel;
+    private final DatagramChannel datagramChannel;
     private ByteBuffer msgBuffer;
 
     public UDPChatChannel() throws IOException {
@@ -37,8 +39,7 @@ public class UDPChatChannel implements  IChatChannel {
     }
 
     public SocketAddress getAddress() throws IOException {
-        InetSocketAddress address = (InetSocketAddress) this.datagramChannel.getLocalAddress();
-        return address;
+        return this.datagramChannel.getLocalAddress();
     }
 
     public Pair<SocketAddress, String> receiveMsg() throws IOException{

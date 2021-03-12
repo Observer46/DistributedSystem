@@ -1,5 +1,10 @@
 package Chat;
 
+import Chat.ChatChannels.TCPChatChannel;
+import Chat.ChatChannels.UDPChatChannel;
+import Chat.Utils.ClientData;
+import Chat.Utils.Pair;
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.channels.*;
@@ -36,31 +41,46 @@ public class Server {
         this.tcpSocketsToClients.put(clientData.getTcpSocketChannel(), clientData);
     }
 
-    private void addClient(ClientData clientData) throws IOException {  // When granted validation
+    public void addClient(ClientData clientData) {  // When granted validation
         System.out.println("Added client: " + clientData.getName());
         this.clientsMap.put(clientData.getName(), clientData);
+    }
+
+    public String createClientList(){
+        StringBuilder stringBuilder = new StringBuilder("Server: Clients in chat room: ");
+        for(ClientData data : this.clientsMap.values())
+            stringBuilder.append(data.getName() + ", ");
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        return stringBuilder.toString();
     }
 
     public boolean validateClient(String clientName){
         return !clientName.equals(Client.NO_NAME) && this.clientsMap.containsKey(clientName);
     }
 
-    private void removeClient(String clientName) throws IOException {
+    public void removeClient(String clientName) throws IOException {
+        this.removeClient(clientName, false);
+    }
+
+    public void removeClient(String clientName, boolean shutdown) throws IOException {
         System.out.println("Removing client: " + clientName);
         this.clientsMap.get(clientName).cleanUp();
         this.clientsMap.remove(clientName);
+        if(!shutdown)
+            this.tcpSendMsgToClients("Server", clientName + " has disconnected.");
     }
 
-    private void serverShutdown() throws IOException {
+    public void serverShutdown() throws IOException {
         Collection<ClientData> clients = new ArrayList<>(this.clientsMap.values());
         for (ClientData clientData : clients) {
             clientData.tcpSendMsg("Server: shutdown - connection lost.");
-            removeClient(clientData.getName());
+            removeClient(clientData.getName(), true);
         }
         this.tcpSelector.close();
     }
 
-    private boolean endOfConnectionCheck(String clientName, String msg) throws IOException {
+    public boolean endOfConnectionCheck(String clientName, String msg) throws IOException {
         if (msg.equals(Client.END_MSG)) {
             this.removeClient(clientName);
             return true;
@@ -72,7 +92,7 @@ public class Server {
         return false;
     }
 
-    private void acceptNewClient() throws IOException {
+    public void acceptNewClient() throws IOException {
         TCPChatChannel clientChannel = new TCPChatChannel(this.tcpSelector, this.serverSocket);
         ClientData clientData = new ClientData(Client.NO_NAME, clientChannel);
         this.addClientSocketOnly(clientData);
@@ -80,7 +100,7 @@ public class Server {
         clientChannel.sendMsg("Enter your name:");
     }
 
-    private void tcpProcessClients() throws IOException {
+    public void tcpProcessClients() throws IOException {
         this.tcpSelector.select();
         Set<SelectionKey> selectedKeys = this.tcpSelector.selectedKeys();
         Iterator<SelectionKey> iterator = selectedKeys.iterator();
@@ -104,7 +124,7 @@ public class Server {
         }
     }
 
-    private void tcpLogClientMsg(String clientName, String msg){
+    public void tcpLogClientMsg(String clientName, String msg){
         System.out.println("(TCP) Log: " + clientName + ": " + msg);
     }
 
@@ -121,18 +141,21 @@ public class Server {
             String msg = thisClient.tcpReceiveMsg();
 
             if (this.validateClient(senderName)) {
-                this.tcpSendMsgToClients(senderName, msg);
+                if(msg.equals(Client.LIST_MSG))
+                    this.clientsMap.get(senderName).tcpSendMsg(this.createClientList());
+                else
+                    this.tcpSendMsgToClients(senderName, msg);
             } else {  // Validation procedure
-                String clientName = msg;
-                if (this.clientsMap.containsKey(clientName)) {
+                if (this.clientsMap.containsKey(msg)) {
                     thisClient.tcpSendMsg(Server.WRONG_NAME);
-                    thisClient.tcpSendMsg("Nickname: " + clientName + " is already taken - pick new nickname:");
-                } else if (clientName.equals(Client.NO_NAME)) {
+                    thisClient.tcpSendMsg("Nickname: " + msg + " is already taken - pick new nickname:");
+                } else if (msg.equals(Client.NO_NAME)) {
                     thisClient.tcpSendMsg(Server.WRONG_NAME);
-                    thisClient.tcpSendMsg("Nickname: " + clientName + " is not valid - pick valid nickname:");
+                    thisClient.tcpSendMsg("Nickname: " + msg + " is not valid - pick valid nickname:");
                 } else {
                     thisClient.tcpSendMsg(Server.ACCEPT_NAME);
-                    thisClient.setName(clientName);
+                    thisClient.setName(msg);
+                    this.tcpSendMsgToClients("Server: ", msg + " has joined the chat!");
                     this.addClient(thisClient);
                 }
             }
@@ -157,7 +180,7 @@ public class Server {
             this.udpSendMsgToClients(clientName, msg);
     }
 
-    private void addUdpChannelToClient(SocketAddress address, String name) {
+    public void addUdpChannelToClient(SocketAddress address, String name) {
         ClientData clientData = this.clientsMap.get(name);
         clientData.setUdpAddressForServerSide(address);
         this.udpSocketsToClients.put(clientData.getUdpAddressServerSide(), clientData);
@@ -181,7 +204,7 @@ public class Server {
         this.udpLogClientMsg(senderName, msg);
     }
 
-    private void serverCycle() throws InterruptedException, IOException {
+    public void serverCycle() throws InterruptedException, IOException {
         while (true) {
             this.tcpProcessClients();
             this.udpProcessClients();
@@ -194,7 +217,7 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Server: Hello world!");
+        System.out.println("Server is online");
         Server server = new Server(Server.SERVER_PORT);
         server.serverCycle();
     }

@@ -1,31 +1,34 @@
-package Chat;
+package Chat.Utils;
 
+import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class ChatTerminal {
 
     public static final int MAX_BUFFERED_LINES = 100;
 
-    private Terminal terminal;
+    private final Terminal terminal;
     private StringBuilder inputMsgBuffer;
     private String stringToPrint = null;
-    private LinkedList<String> msgHistory = new LinkedList<>();
+    private final LinkedList<String> msgHistory = new LinkedList<>();
 
     public ChatTerminal() throws IOException {
         this.terminal = new DefaultTerminalFactory().createTerminal();
+        this.terminal.setForegroundColor(TextColor.Factory.fromString("green"));
         this.inputMsgBuffer = new StringBuilder();
     }
 
     public void updateMsgHistory(String msg){
         this.msgHistory.addFirst(msg);
-        System.out.println("Adding: " + msg);
         if(this.msgHistory.size() > ChatTerminal.MAX_BUFFERED_LINES)
             this.msgHistory.removeLast();
     }
@@ -33,26 +36,16 @@ public class ChatTerminal {
     public void scrollIfNeeded() throws IOException {
         int screenRowLimit = this.terminal.getTerminalSize().getRows();
         if(this.msgHistory.size() >= screenRowLimit){
-            int charsInLine = this.terminal.getTerminalSize().getColumns();
-            StringBuilder clearLine = new StringBuilder();
-
-            for(int i=0; i < charsInLine; i++)
-                clearLine.append(' ');
-
-            String clearLineString = clearLine.toString();
+            this.terminal.clearScreen();
             int j = 0;
 
             for(int i = screenRowLimit - 3; i >= 0; i--){
-                this.terminal.setCursorPosition(0, i);
-                this.printToTerminal(clearLineString, false);
                 String lineToPrint = this.msgHistory.get(j);
                 this.terminal.setCursorPosition(0, i);
                 this.printToTerminal(lineToPrint, false);
                 j++;
             }
 
-            this.terminal.setCursorPosition(0, screenRowLimit - 2);
-            this.printToTerminal(clearLineString, false);
             this.terminal.setCursorPosition(0, screenRowLimit - 2);
         }
     }
@@ -67,7 +60,7 @@ public class ChatTerminal {
         else if (key.getKeyType().equals(KeyType.Backspace)){
             this.eraseChar();
         }
-        else {
+        else if(key.getCharacter() != null){
             this.inputMsgBuffer.append(key.getCharacter());
             this.terminal.putCharacter(key.getCharacter());
             this.terminal.flush();
@@ -94,19 +87,21 @@ public class ChatTerminal {
         boolean firstLine = true;
         for(String line : lines) {
             this.terminal.putString(line);
+
             if(logMessage)
                 this.updateMsgHistory(line);
-            System.out.println("Printing: " + line);
-            if(firstLine){
-                int fillIn = this.inputMsgBuffer.length() + 2 - line.length();
-                StringBuilder blanks = new StringBuilder();
-                for(int i=0; i < fillIn; i++)
-                    blanks.append(" ");
-                this.terminal.putString(blanks.toString());
+
+            int fillIn = this.inputMsgBuffer.length() + 2 - line.length();
+            if(firstLine && fillIn > 0){
+                char[] fillArray = new char[fillIn];
+                Arrays.fill(fillArray, ' ');
+                String blanks = new String(fillArray);
+                this.terminal.putString(blanks);
             }
             this.terminal.putCharacter('\n');
             firstLine = false;
         }
+
         this.terminal.flush();
         if(logMessage)
             this.scrollIfNeeded();
@@ -161,16 +156,5 @@ public class ChatTerminal {
 
     public void close() throws IOException {
         this.terminal.close();
-    }
-
-    public static void main(String[] args) throws InterruptedException, IOException {
-        ChatTerminal terminal = new ChatTerminal();
-        terminal.printToTerminal("Hello boi!");
-        terminal.printToTerminal("This tis terminal test");
-        terminal.printCursor();
-        while(true){
-            terminal.putChar();
-            Thread.sleep(1);
-        }
     }
 }
