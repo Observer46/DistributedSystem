@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractUser {
-    public static final String EXCHANGE_NAME = "expedition.exchange";
+    public static final String EXCHANGE_NAME = "expedition-exchange";
 
     protected String name;
     protected ChatTerminal terminal;
@@ -19,7 +19,7 @@ public abstract class AbstractUser {
     protected AbstractUser(String role, TextColor chatColor) throws IOException, TimeoutException {
         this.terminal = new ChatTerminal(chatColor);
         this.terminal.printBufferForClient(role);
-        this.terminal.printBufferForClient("Enter " + role.substring(1, role.length() - 2) + " name: ");
+        this.terminal.printBufferForClient("Enter " + role.substring(1, role.length() - 1) + " name: ");
         this.name = this.terminal.getInputBlocking();
 
         // connection & channel
@@ -42,34 +42,36 @@ public abstract class AbstractUser {
         this.channel.queueBind(queueName, EXCHANGE_NAME, key);
     }
 
-    protected Consumer adminConsumer(){
+    protected Consumer defaultConsumer(){
         final ChatTerminal terminal = this.terminal;
         return new DefaultConsumer(this.channel){
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                String message = new String(body, StandardCharsets.UTF_8);
-                terminal.printBufferForClient("Received: " + message);
+                String[] msgContent = new String(body, StandardCharsets.UTF_8).split("&");
+                String role = msgContent[0];
+                String name = msgContent[1];
+                String msg  = msgContent[2];
+                terminal.printBufferForClient(role + "@" + name + ": " + msg);
             }
         };
     }
 
     protected void runQueueThread(final String queueName, final Consumer consumer){
-        Thread adminQueueThread = new Thread(){
+        Thread adminListener = new Thread(){
             @Override
             public void run() {
                 try {
-                    while(true)
-                        channel.basicConsume(queueName, true, consumer);
+                    channel.basicConsume(queueName, true, consumer);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
-        adminQueueThread.start();
+        adminListener.start();
     }
 
     protected void sendMsg(String msg, String key) throws IOException {
         channel.basicPublish(EXCHANGE_NAME, key, null, msg.getBytes(StandardCharsets.UTF_8));
-        terminal.printBufferForClient("-> Sent request for: " + key);
+        terminal.printBufferForClient("Sent msg with key: " + key);
     }
 }
