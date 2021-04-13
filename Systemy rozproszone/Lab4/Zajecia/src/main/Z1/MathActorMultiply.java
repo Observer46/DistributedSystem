@@ -7,6 +7,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 
 public class MathActorMultiply extends AbstractBehavior<MathActor.MathCommandMultiply> {
+    private int opCount = 0;
 
     // --- use messages from MathActor -> no need to define new ones
 
@@ -28,10 +29,8 @@ public class MathActorMultiply extends AbstractBehavior<MathActor.MathCommandMul
     }
 
     private Behavior<MathActor.MathCommandMultiply> onMathCommandMultiply(MathActor.MathCommandMultiply mathCommandMultiply) {
-        System.out.println("actorMultiply: received command: multiply");
         int result = mathCommandMultiply.firstNumber * mathCommandMultiply.secondNumber;
-        System.out.println("actorMultiply: multiply result = " + result);
-        System.out.println("actorMultiply: sending response");
+        System.out.println("actorMultiply: opCount = " + ++opCount);
         mathCommandMultiply.replyTo.tell(new MathActor.MathCommandResult(result));
         return this;
     }

@@ -23,29 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f752c71d-1268-409a-8791-7540620b9dec" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nodeA.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nodeB.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/HelloWorld/HelloActor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/HelloWorld/HelloMain.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z1/MathActor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z1/MathActorMultiply.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z1/Z1_Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z2/ActorTextService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z2/ActorUpperCase.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z2/Z2_Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z2/Z2_NodeA.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/Z2/Z2_NodeB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zajecia.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/AppTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Test.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/org/example/AppTest.class" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/Z1/MathActorDivide.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Z1/MathActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Z1/MathActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Z1/MathActorMultiply.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Z1/MathActorMultiply.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Z1/Z1_Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Z1/Z1_Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Z1/MathActor$MathCommandResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Z1/MathActor$MathCommandResult.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Z1/MathActor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Z1/MathActor.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +38,13 @@
   </component>
   <component name="CodeStyleSettingsInfer">
     <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
@@ -80,12 +71,15 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="Z1" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\micro\Desktop\Studia\Semestr6\DistributedSystems\Systemy rozproszone\Lab4\Zajecia" />
       <recent name="C:\Users\micro\Desktop\Studia\Semestr6\DistributedSystems\Systemy rozproszone\Lab4\Zajecia\src\main" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Z1_Main">
     <configuration name="HelloMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="HelloWorld.HelloMain" />
       <module name="Zajecia" />
@@ -99,8 +93,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Z1_Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Z1.Z1_Main" />
+      <module name="Zajecia" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Z1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Z1_Main" />
         <item itemvalue="Application.HelloMain" />
       </list>
     </recent_temporary>
@@ -128,21 +136,25 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1618296648674">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state width="1877" height="312" key="GridCell.Tab.0.bottom" timestamp="1618304359696">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@-1920.0.1920.1040" timestamp="1618296648674" />
-    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1618296648674">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state width="1877" height="312" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1618304359696" />
+    <state width="1877" height="312" key="GridCell.Tab.0.center" timestamp="1618304359696">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@-1920.0.1920.1040" timestamp="1618296648674" />
-    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1618296648674">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state width="1877" height="312" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1618304359696" />
+    <state width="1877" height="312" key="GridCell.Tab.0.left" timestamp="1618304359696">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@-1920.0.1920.1040" timestamp="1618296648674" />
-    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1618296648674">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state width="1877" height="312" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1618304359696" />
+    <state width="1877" height="312" key="GridCell.Tab.0.right" timestamp="1618304359696">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@-1920.0.1920.1040" timestamp="1618296648674" />
+    <state width="1877" height="312" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1618304359696" />
   </component>
 </project>
