@@ -15,6 +15,9 @@ public class Z2_NodeB {
                 context -> {
 
                     // TODO : text service
+                    ActorRef<ActorTextService.Command> actorTextService = context.spawn(ActorTextService.create(), "textService");
+                    Thread.sleep(5000);
+                    actorTextService.tell(new ActorTextService.Request("hello"));
 
                     return Behaviors.receive(Void.class)
                             .onSignal(Terminated.class, sig -> Behaviors.stopped())

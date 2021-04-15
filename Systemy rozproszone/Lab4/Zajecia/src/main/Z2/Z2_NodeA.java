@@ -15,6 +15,8 @@ public class Z2_NodeA {
                 context -> {
 
                     // TODO : only workers
+                    context.spawn(ActorUpperCase.create(), "upper1");
+                    context.spawn(ActorUpperCase.create(), "upper2");
 
                     return Behaviors.receive(Void.class)
                             .onSignal(Terminated.class, sig -> Behaviors.stopped())
