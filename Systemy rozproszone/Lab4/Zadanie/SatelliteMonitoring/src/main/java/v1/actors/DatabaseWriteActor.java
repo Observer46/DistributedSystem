@@ -1,4 +1,4 @@
-package actors;
+package v1.actors;
 
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;

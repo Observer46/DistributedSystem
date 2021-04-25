@@ -23,17 +23,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f752c71d-1268-409a-8791-7540620b9dec" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/dispatcher.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/Main2.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/SingleSatelliteCheckActor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/DatabaseWriteActor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/DispatcherActor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/DatabaseWriteResults.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/DispatcherMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/MonitoringMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/utils/DBManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/utils/SatelliteAPI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/SatelliteMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/DatabaseReadActor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/DatabaseWriteActor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/DispatcherActor2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/SatelliteActor2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/SatelliteMonitoringActor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/actors/SatelliteQueryActor2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/Akka1.png" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/Akka1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/dispatcher.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/dispatcher.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/satelliteDatabase.db" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/satelliteDatabase.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/Main2.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v2/Main2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/SingleSatelliteCheckActor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/DatabaseReadActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/actors/DatabaseReadActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/DatabaseWriteActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/actors/DatabaseWriteActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/DispatcherActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/actors/DispatcherActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/SatelliteMonitoringActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/actors/SatelliteMonitoringActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/actors/SatelliteQueryActor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/v1/actors/SatelliteQueryActor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/DispatcherMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Zadanie/SatelliteMonitoring/src/main/java/messages/DispatcherMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

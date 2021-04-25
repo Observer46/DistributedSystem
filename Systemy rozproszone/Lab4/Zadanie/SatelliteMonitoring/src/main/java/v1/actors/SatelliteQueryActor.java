@@ -1,4 +1,4 @@
-package actors;
+package v1.actors;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
@@ -6,12 +6,9 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import akka.util.Timeout;
 import messages.DatabaseWriteResults;
 import messages.DispatcherMessage;
 import messages.MonitoringMessage;
-import scala.Array;
-import scala.concurrent.duration.Duration;
 import utils.SatelliteAPI;
 
 import java.util.ArrayList;

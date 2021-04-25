@@ -1,13 +1,13 @@
-import actors.DatabaseWriteActor;
-import actors.DispatcherActor;
-import actors.SatelliteMonitoringActor;
-import actors.SatelliteQueryActor;
+package v1;
+
+import v1.actors.DatabaseWriteActor;
+import v1.actors.DispatcherActor;
+import v1.actors.SatelliteMonitoringActor;
+import v1.actors.SatelliteQueryActor;
 import akka.actor.typed.*;
 import akka.actor.typed.javadsl.Behaviors;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import messages.DatabaseWriteResults;
-import messages.DispatcherMessage;
 import messages.MonitoringMessage;
 import utils.DBManager;
 
@@ -20,7 +20,7 @@ public class Main {
                 context -> {
                     DBManager.prepareDB();
 
-                    SatelliteMonitoringActor.dispatcher = context.spawn(
+                    DispatcherActor.dispatcher = context.spawn(
                             Behaviors.supervise(DispatcherActor.create())
                                     .onFailure(Exception.class, SupervisorStrategy.resume()),
                             "dispatcher");

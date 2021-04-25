@@ -9,7 +9,7 @@ public class DispatcherMessage {
 
     @Getter
     @Builder
-    public static class SatelliteQuery implements Dispatcher {
+    public static class SatelliteQuery implements Dispatcher, SatelliteMessage.QueryWorkerMessage {
         private final int queryId;
         private final int firstSatId;
         private final int range;

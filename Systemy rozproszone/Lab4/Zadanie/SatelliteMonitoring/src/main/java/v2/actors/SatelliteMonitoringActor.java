@@ -1,4 +1,4 @@
-package actors;
+package v2.actors;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
@@ -14,9 +14,6 @@ import java.util.Map;
 import java.util.Random;
 
 public class SatelliteMonitoringActor extends AbstractBehavior<MonitoringMessage.Monitoring> {
-
-    public static ActorRef<DispatcherMessage.Dispatcher> dispatcher;
-
     private final Map<Integer, Long> queryStartTime = new HashMap<>();
     private int queryCounter = 0;
     private Random rand = new Random();
@@ -40,7 +37,7 @@ public class SatelliteMonitoringActor extends AbstractBehavior<MonitoringMessage
     }
 
     public void createSatelliteQuery(int firstSatId, int range, int timeout){
-        dispatcher.tell(DispatcherMessage.SatelliteQuery.builder()
+        DispatcherActor2.dispatcher.tell(DispatcherMessage.SatelliteQuery.builder()
                 .queryId(queryCounter)
                 .firstSatId(firstSatId)
                 .range(range)
@@ -51,7 +48,7 @@ public class SatelliteMonitoringActor extends AbstractBehavior<MonitoringMessage
     }
 
     public void createDatabaseReadQuery(int satId){
-        dispatcher.tell(DispatcherMessage.DatabaseReadQuery.builder()
+        DispatcherActor2.dispatcher.tell(DispatcherMessage.DatabaseReadQuery.builder()
                 .satId(satId)
                 .satelliteMonitor(getContext().getSelf())
                 .build());
