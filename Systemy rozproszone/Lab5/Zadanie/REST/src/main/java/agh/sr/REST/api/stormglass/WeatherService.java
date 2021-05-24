@@ -1,13 +1,19 @@
-package agh.sr.REST.api;
+package agh.sr.REST.api.stormglass;
 
-import agh.sr.REST.api.model.AnalyzedData;
-import agh.sr.REST.api.model.WeatherRequest;
-import agh.sr.REST.api.model.WeatherResponse;
+import agh.sr.REST.api.mapbox.MapResponse;
+import agh.sr.REST.api.mapbox.MapService;
+import agh.sr.REST.api.stormglass.model.AnalyzedData;
+import agh.sr.REST.api.stormglass.model.WeatherRequest;
+import agh.sr.REST.api.stormglass.model.WeatherResponse;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -22,17 +28,24 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WeatherService {
     private static final String API_KEY = "0efbe204-b4b8-11eb-80d0-0242ac130002-0efbe2d6-b4b8-11eb-80d0-0242ac130002";
     private static final String WEATHER_ENDPOINT = "https://api.stormglass.io/v2/weather/point?";
+
+    private final MapService mapService;
 
     @Getter
     private String resString;
 
     public WeatherResponse getWeather(WeatherRequest request) throws IOException {
+        MapResponse mapResponse = mapService.getCoords(request.getSearchName());
+        log.info("Lat: " + mapResponse.getLat());
+        log.info("Lng: " + mapResponse.getLng());
+
         Map<String, Object> params = new HashMap<>();
-        params.put("lat", request.getLat());
-        params.put("lng", request.getLng());
+        params.put("lat", mapResponse.getLat());
+        params.put("lng", mapResponse.getLng());
         params.put("params", request.getParams());
         params.put("start", request.getStart());
         params.put("end", request.getEnd());

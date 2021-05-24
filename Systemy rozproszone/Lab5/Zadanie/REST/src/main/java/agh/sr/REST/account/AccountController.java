@@ -2,8 +2,8 @@ package agh.sr.REST.account;
 
 import agh.sr.REST.account.model.LoginRequest;
 import agh.sr.REST.account.model.RegisterRequest;
-import agh.sr.REST.api.WeatherService;
-import agh.sr.REST.api.model.WeatherResponse;
+import agh.sr.REST.api.stormglass.WeatherService;
+import agh.sr.REST.api.stormglass.model.WeatherResponse;
 import agh.sr.REST.db.DBService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

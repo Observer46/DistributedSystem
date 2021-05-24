@@ -1,4 +1,4 @@
-package agh.sr.REST.api.model;
+package agh.sr.REST.api.stormglass.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,8 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class WeatherRequest {
-    private String lat;
-    private String lng;
+    private String searchName;
     private String params;
     private String start;
     private String end;

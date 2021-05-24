@@ -20,10 +20,8 @@
   </form>
   <h3>Data request</h3>
   <form action="/weather" method="get">
-    <label for="lng">Longitude:</label>
-    <input type="number" step="0.01" id="lng" name="lng" min="-180" max="180"><br>
-    <label for="lat">Latitude:</label>
-    <input type="number" step="0.01" id="lat" name="lat" min="-90" max="90"><br>
+    <label for="searchName">Enter search address:</label>
+    <input type="text"id="searchName" name="searchName" pattern=".{1,}" required><br>
     <input type="checkbox" id="airTemperature" name="airTemperature">
     <label for="airTemperature">Air temperature</label><br>
     <input type="checkbox" id="humidity" name="humidity">
@@ -31,9 +29,9 @@
     <input type="checkbox" id="windSpeed" name="windSpeed">
     <label for="humidity">Wind speed</label><br>
     <label for="start">Start date:</label>
-    <input type="date" id="start" name="start"><br>
+    <input type="date" id="start" name="start" required><br>
     <label for="end">End date:</label>
-    <input type="date" id="end" name="end"><br>
+    <input type="date" id="end" name="end" required><br>
     <input type="submit" value="Submit">
   </form>
 </div>

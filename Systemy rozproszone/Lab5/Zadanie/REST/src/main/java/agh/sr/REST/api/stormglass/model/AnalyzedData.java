@@ -1,4 +1,4 @@
-package agh.sr.REST.api.model;
+package agh.sr.REST.api.stormglass.model;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,8 +1,8 @@
-package agh.sr.REST.api;
+package agh.sr.REST.api.stormglass;
 
 import agh.sr.REST.account.HTMLService;
-import agh.sr.REST.api.model.WeatherRequest;
-import agh.sr.REST.api.model.WeatherResponse;
+import agh.sr.REST.api.stormglass.model.WeatherRequest;
+import agh.sr.REST.api.stormglass.model.WeatherResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -18,8 +18,7 @@ public class WeatherController {
     private final HTMLService htmlService;
 
     @GetMapping(value = "weather", produces = MediaType.TEXT_HTML_VALUE)
-    public String getWeather(@RequestParam String lng,
-                             @RequestParam String lat,
+    public String getWeather(@RequestParam String searchName,
                              @RequestParam(required = false) String airTemperature,
                              @RequestParam(required = false) String humidity,
                              @RequestParam(required = false) String windSpeed,
@@ -42,8 +41,7 @@ public class WeatherController {
 
         String params = paramsSb.substring(0, paramsSb.length() - 1);
         WeatherRequest request = WeatherRequest.builder()
-                .lat(lat)
-                .lng(lng)
+                .searchName(searchName)
                 .params(params)
                 .start(weatherService.convertDateToUTCTimestamp(start))
                 .end(weatherService.convertDateToUTCTimestamp(end))
@@ -56,18 +54,18 @@ public class WeatherController {
                     weatherService.analyzeData(response.getAirTemperature(), response.getHours()) + "</div>"
                     : "";
 
-            String humidityInfo = airTemperature != null ? "<div><h5>Humidity info:</h5> " +
+            String humidityInfo = humidity != null ? "<div><h5>Humidity info:</h5> " +
                     weatherService.analyzeData(response.getHumidity(), response.getHours()) + "</div>"
                     : "";
 
-            String windSpeedInfo = airTemperature != null ? "<div><h5>Wind speed info:</h5> " +
+            String windSpeedInfo = windSpeed != null ? "<div><h5>Wind speed info:</h5> " +
                     weatherService.analyzeData(response.getWindSpeed(), response.getHours()) + "</div>"
                     : "";
 
 
             return "<html>\n" +
                     "<header><title>Result</title></header>" +
-                    "<body><h1>Response:</h1>" +
+                    "<body><h1>Response for: " + request.getSearchName() + "</h1>" +
                     "<div><form action=\"/weather/save\" method=\"post\"><label for=\"name\">Save results - enter name:</label>" +
                     "<input type=\"text\" id=\"name\" name=\"name\"><br>"+
                     "<input type=\"submit\" value=\"Save\"></form>" +
