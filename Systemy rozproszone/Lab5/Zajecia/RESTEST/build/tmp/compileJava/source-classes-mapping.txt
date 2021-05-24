@@ -1,0 +1,14 @@
+services/rest/RESTEST/RESTHelloWorld.java
+ services.rest.RESTEST.RESTHelloWorld
+services/rest/RESTEST/RESTHelloWorldClient.java
+ services.rest.RESTEST.RESTHelloWorldClient
+services/rest/RESTEST/model/Todo.java
+ services.rest.RESTEST.model.Todo
+services/rest/RESTEST/TodoResourceSimple.java
+ services.rest.RESTEST.TodoResourceSimple
+services/rest/RESTEST/TodoClient.java
+ services.rest.RESTEST.TodoClient
+services/rest/RESTEST/TodoDao.java
+ services.rest.RESTEST.TodoDao
+services/rest/RESTEST/TodoResource.java
+ services.rest.RESTEST.TodoResource

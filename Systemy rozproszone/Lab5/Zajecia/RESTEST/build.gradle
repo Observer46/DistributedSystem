@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'services.rest'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.7.1'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.26'
+    compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.26'
+    compile 'javax.servlet:javax.servlet-api:4.0.0-b07'
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}

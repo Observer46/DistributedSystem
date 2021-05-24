@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Weather you like it!</title>
+  </head>
+  <body>
+    <div>
+      <h1>Login</h1>
+      <form action="/login" method="post">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Log in">
+      </form>
+    </div>
+    <div>
+      <h1>Sign up</h1>
+      <form action="/register" method="post">
+        <label for="email_register">Email:</label>
+        <input type="email" id="email_register" name="email"><br><br>
+        <label for="password_register">Password (min. 8 characters):</label>
+        <input type="password" id="password_register" name="password"><br><br>
+        <label for="password_repeat">Password (min. 8 characters):</label>
+        <input type="password" id="password_repeat" name="repeatedPassword"><br><br>
+        <input type="submit" value="Sign up">
+      </form>
+    </div>
+  </body>
+</html>
